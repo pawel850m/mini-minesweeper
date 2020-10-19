@@ -1,0 +1,20 @@
+C:\Users\pawel\Desktop\Minesweeper\Minesweeper\bin\Debug\Minesweeper.exe.config
+C:\Users\pawel\Desktop\Minesweeper\Minesweeper\bin\Debug\Minesweeper.exe
+C:\Users\pawel\Desktop\Minesweeper\Minesweeper\bin\Debug\Minesweeper.pdb
+C:\Users\pawel\Desktop\Minesweeper\Minesweeper\obj\Debug\Minesweeper.csprojAssemblyReference.cache
+C:\Users\pawel\Desktop\Minesweeper\Minesweeper\obj\Debug\Minesweeper.Properties.Resources.resources
+C:\Users\pawel\Desktop\Minesweeper\Minesweeper\obj\Debug\Minesweeper.csproj.GenerateResource.cache
+C:\Users\pawel\Desktop\Minesweeper\Minesweeper\obj\Debug\Minesweeper.csproj.CoreCompileInputs.cache
+C:\Users\pawel\Desktop\Minesweeper\Minesweeper\obj\Debug\Minesweeper.exe
+C:\Users\pawel\Desktop\Minesweeper\Minesweeper\obj\Debug\Minesweeper.pdb
+C:\Users\pawel\Desktop\Minesweeper\Minesweeper\obj\Debug\Minesweeper.Form1.resources
+C:\Users\pawel\Dysk Google\tyg\2\Minesweeper\Minesweeper\bin\Debug\Minesweeper.exe.config
+C:\Users\pawel\Dysk Google\tyg\2\Minesweeper\Minesweeper\bin\Debug\Minesweeper.exe
+C:\Users\pawel\Dysk Google\tyg\2\Minesweeper\Minesweeper\bin\Debug\Minesweeper.pdb
+C:\Users\pawel\Dysk Google\tyg\2\Minesweeper\Minesweeper\obj\Debug\Minesweeper.csprojAssemblyReference.cache
+C:\Users\pawel\Dysk Google\tyg\2\Minesweeper\Minesweeper\obj\Debug\Minesweeper.Form1.resources
+C:\Users\pawel\Dysk Google\tyg\2\Minesweeper\Minesweeper\obj\Debug\Minesweeper.Properties.Resources.resources
+C:\Users\pawel\Dysk Google\tyg\2\Minesweeper\Minesweeper\obj\Debug\Minesweeper.csproj.GenerateResource.cache
+C:\Users\pawel\Dysk Google\tyg\2\Minesweeper\Minesweeper\obj\Debug\Minesweeper.csproj.CoreCompileInputs.cache
+C:\Users\pawel\Dysk Google\tyg\2\Minesweeper\Minesweeper\obj\Debug\Minesweeper.exe
+C:\Users\pawel\Dysk Google\tyg\2\Minesweeper\Minesweeper\obj\Debug\Minesweeper.pdb
