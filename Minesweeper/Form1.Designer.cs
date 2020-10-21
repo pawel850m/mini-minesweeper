@@ -31,7 +31,6 @@ namespace Minesweeper
 		private void InitializeComponent()
 		{
             this.menuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.menuStrip1.SuspendLayout();
@@ -41,20 +40,11 @@ namespace Minesweeper
             // 
             this.menuToolStripMenuItem.AutoSize = false;
             this.menuToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.menuToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.restartToolStripMenuItem});
             this.menuToolStripMenuItem.Name = "menuToolStripMenuItem";
             this.menuToolStripMenuItem.Padding = new System.Windows.Forms.Padding(0);
-            this.menuToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
-            this.menuToolStripMenuItem.Text = "Game";
+            this.menuToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
+            this.menuToolStripMenuItem.Text = "Reset";
             this.menuToolStripMenuItem.TextDirection = System.Windows.Forms.ToolStripTextDirection.Horizontal;
-            // 
-            // restartToolStripMenuItem
-            // 
-            this.restartToolStripMenuItem.Name = "restartToolStripMenuItem";
-            this.restartToolStripMenuItem.ShowShortcutKeys = false;
-            this.restartToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.restartToolStripMenuItem.Text = "Restart";
             // 
             // menuStrip1
             // 
@@ -100,7 +90,6 @@ namespace Minesweeper
         private System.Windows.Forms.ToolStripMenuItem menuToolStripMenuItem;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private ToolStripMenuItem restartToolStripMenuItem;
     }
 }
 
