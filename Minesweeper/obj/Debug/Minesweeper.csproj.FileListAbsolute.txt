@@ -28,3 +28,13 @@ C:\Users\pawel\Source\Repos\mini-minesweeper\Minesweeper\obj\Debug\Minesweeper.c
 C:\Users\pawel\Source\Repos\mini-minesweeper\Minesweeper\obj\Debug\Minesweeper.csproj.CoreCompileInputs.cache
 C:\Users\pawel\Source\Repos\mini-minesweeper\Minesweeper\obj\Debug\Minesweeper.exe
 C:\Users\pawel\Source\Repos\mini-minesweeper\Minesweeper\obj\Debug\Minesweeper.pdb
+C:\Users\pawel\Desktop\mini-minesweeper\Minesweeper\bin\Debug\Minesweeper.exe.config
+C:\Users\pawel\Desktop\mini-minesweeper\Minesweeper\bin\Debug\Minesweeper.exe
+C:\Users\pawel\Desktop\mini-minesweeper\Minesweeper\bin\Debug\Minesweeper.pdb
+C:\Users\pawel\Desktop\mini-minesweeper\Minesweeper\obj\Debug\Minesweeper.csprojAssemblyReference.cache
+C:\Users\pawel\Desktop\mini-minesweeper\Minesweeper\obj\Debug\Minesweeper.Form1.resources
+C:\Users\pawel\Desktop\mini-minesweeper\Minesweeper\obj\Debug\Minesweeper.Properties.Resources.resources
+C:\Users\pawel\Desktop\mini-minesweeper\Minesweeper\obj\Debug\Minesweeper.csproj.GenerateResource.cache
+C:\Users\pawel\Desktop\mini-minesweeper\Minesweeper\obj\Debug\Minesweeper.csproj.CoreCompileInputs.cache
+C:\Users\pawel\Desktop\mini-minesweeper\Minesweeper\obj\Debug\Minesweeper.exe
+C:\Users\pawel\Desktop\mini-minesweeper\Minesweeper\obj\Debug\Minesweeper.pdb

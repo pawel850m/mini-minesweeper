@@ -7,6 +7,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,9 +15,11 @@ namespace Minesweeper
 {
 	public partial class Form1 : Form
 	{
+        private int time = 0;
         private List<int> mines;
         private List<Button> buttons;
         private Boolean InitGame;
+        private Label label;
 
         public Form1()
 		{
@@ -25,8 +28,25 @@ namespace Minesweeper
             InitBoard();
             
 		}
+        private void startTimer()
+        {
+            time = 0;
+            timer.Start();
+        }
         private void InitBoard()
         {
+            startTimer();
+            label = new Label();
+            label.Text = "10:00 WIN";
+            label.AutoSize = true;
+            label.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            label.Location = new System.Drawing.Point(0, 0);
+            label.Name = "label1";
+            label.Size = new System.Drawing.Size(52, 21);
+            label.TabIndex = 0;
+            flowLayoutPanel2.Controls.Add(label);
+
+
             buttons = new List<Button>();
             mines = new List<int>();
             for (int i = 0; i < 100; i++)
@@ -35,15 +55,37 @@ namespace Minesweeper
                 buttons.Add(button1);
                 buttons[i].Name = (i).ToString();
                 button1.Size = new System.Drawing.Size(30, 30);
-                button1.BackColor = Color.LightGray;
+                button1.BackColor = Color.FromArgb(192, 192, 192);
                 button1.Text = " ";
+                button1.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+                button1.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
                 //button1.Text = (i + 1).ToString();
                 button1.Cursor = System.Windows.Forms.Cursors.Hand;
                 button1.Margin = new System.Windows.Forms.Padding(0);
                 flowLayoutPanel1.Controls.Add(button1);
                 button1.Click += button1_Click;
+                button1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.button1_RightClick);
             }
             flowLayoutPanel1.Visible = true;
+        }
+
+        private void CheckWin()
+        {
+            int count = 0;
+            for (int i = 0; i < 100; i++)
+            {
+                if(buttons[i].BackColor != Color.FromArgb(192, 192, 192))
+                {
+                    count++;
+                }
+            }
+            if(count == 80)
+            {
+                timer.Stop();
+                label.ForeColor = System.Drawing.Color.ForestGreen;
+                label.Text = (time - 1).ToString() + " s. WIN";
+                SetButtonsDisabled();
+            }
         }
         private void ClearBoard()
         {
@@ -52,7 +94,7 @@ namespace Minesweeper
                 buttons[i].Text = " ";
                 buttons[i].Enabled = true;
                 buttons[i].ForeColor = System.Drawing.Color.Black;
-                buttons[i].BackColor = Color.LightGray;
+                buttons[i].BackColor = Color.FromArgb(192, 192, 192);
             }
             mines = new List<int>();
         }
@@ -78,6 +120,7 @@ namespace Minesweeper
             Random rand = new Random();
             return rand.Next(a, b);
         }
+     
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -85,26 +128,61 @@ namespace Minesweeper
         }
         private void restart(object sender, EventArgs e)
         {
+            label.ForeColor = System.Drawing.Color.Black;
             InitGame = false;
             flag = true;
             ClearBoard();
+            label.Text = "restarting...";
+            startTimer();
         }
                 Boolean flag = true;
         private void button1_Click(object sender, EventArgs e)
         {
             clickButton(sender);
         }
+        private void button1_RightClick(object sender, EventArgs e)
+        {
+            Button button = (Button)sender;
+            if(button.Text != " " && button.Text != "!")
+            {
+                return;
+            }
+            switch (MouseButtons)
+            {
+                case MouseButtons.Right:
+                    
+                    if(button.Text == "!")
+                    {
+                        button.ForeColor = System.Drawing.Color.Black;
+                        button.Text = " ";
+                    }
+                    else
+                    {
+                        button.ForeColor = System.Drawing.Color.OrangeRed;
+                        button.Text = "!";
+                    }
+                    
+                    break;
+            }
+            
+        }
         private void clickButton(object sender)
         {
             Button button = (Button)sender;
-            button.BackColor = Color.White;
-            buttons[Int32.Parse(button.Name)].BackColor = Color.White;
+            if (button.Text == "!")
+            {
+                return;
+            }
+            button.BackColor = Color.FromArgb(225, 225, 225);
+            buttons[Int32.Parse(button.Name)].BackColor = Color.FromArgb(225, 225, 225);
             buttons[Int32.Parse(button.Name)].Text = " ";
             if (mines.Contains(Int32.Parse(button.Name)))
             {
                 button.ForeColor = System.Drawing.Color.Red;
                 ShowMines();
                 SetButtonsDisabled();
+                timer.Stop();
+                label.ForeColor = System.Drawing.Color.OrangeRed;
             }
             else
             {
@@ -113,7 +191,6 @@ namespace Minesweeper
                     for (int i = 0; i < 20; i++)
                     {
                         int tempnumber = RandomNumber(0, 99);
-                        Console.WriteLine("tak");
                         while (IsMine(tempnumber) || tempnumber == Int32.Parse(button.Name))
                         {
                             tempnumber = RandomNumber(0, 99);
@@ -164,17 +241,20 @@ namespace Minesweeper
 
                             for (int i = -1; i < 2; i++)
                             {
-                                for (int j = -1; j < 2; j++)
+                            Console.WriteLine(i);
+                            for (int j = -1; j < 2; j++)
                                 {
                                     if (j == 0 && i == 0) continue;
+                                Console.WriteLine(i);
+                                Console.WriteLine(j);
                                     if (IsValid(row - i, col - j) && !IsMine(10 * (row - i) + col - j))
                                     {
                                     int number = 10 * (row - i) + col - j;
-                                    if (buttons[number].BackColor == Color.White) continue;
+                                    if (buttons[number].BackColor == Color.FromArgb(225, 225, 225)) continue;
                                         
                                         clickButton(buttons[number]);
                                     }
-                                    else break;
+                              
                                 }
                             }
                             flag = false;
@@ -202,6 +282,7 @@ namespace Minesweeper
 
             }
             //flag = true;
+            CheckWin();
         }
         private void ShowMines()
         {
@@ -283,5 +364,25 @@ namespace Minesweeper
 
         }
 
+        private void przycisk(object sender, MouseEventArgs e)
+        {
+            switch (MouseButtons)
+            {
+                case MouseButtons.Right:
+                    Console.WriteLine("dziala");
+                    break;
+            }
+        }
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            time++;
+            label.Text = "0 s.";
+        }
+
+        private void menuToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
