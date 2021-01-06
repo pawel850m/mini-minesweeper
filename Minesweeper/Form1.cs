@@ -15,18 +15,21 @@ namespace Minesweeper
 {
 	public partial class Form1 : Form
 	{
-        private int time = 0;
-        private List<int> mines;
+       private int time = 0;
+        
         private List<Button> buttons;
         private Boolean InitGame;
         private Label label;
-
+        private Rules rules;
+        private Gameplay gameplay;
+        private Mines mines = new Mines();
         public Form1()
 		{
 			InitializeComponent();
             InitGame = false;
             InitBoard();
-            
+            rules = new Rules();
+           gameplay = new Gameplay();
 		}
         private void startTimer()
         {
@@ -48,7 +51,7 @@ namespace Minesweeper
 
 
             buttons = new List<Button>();
-            mines = new List<int>();
+            mines.initMines();
             for (int i = 0; i < 100; i++)
             {
                 Button button1 = new Button();
@@ -63,28 +66,20 @@ namespace Minesweeper
                 button1.Cursor = System.Windows.Forms.Cursors.Hand;
                 button1.Margin = new System.Windows.Forms.Padding(0);
                 flowLayoutPanel1.Controls.Add(button1);
-                button1.Click += button1_Click;
-                button1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.button1_RightClick);
+                button1.Click += field_LeftClick;
+                button1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.field_RightClick);
             }
             flowLayoutPanel1.Visible = true;
         }
 
-        private void CheckWin()
+        private void setWin()
         {
-            int count = 0;
-            for (int i = 0; i < 100; i++)
-            {
-                if(buttons[i].BackColor != Color.FromArgb(192, 192, 192))
-                {
-                    count++;
-                }
-            }
-            if(count == 80)
+            if(rules.isWin(buttons))
             {
                 timer.Stop();
                 label.ForeColor = System.Drawing.Color.ForestGreen;
                 label.Text = (time - 1).ToString() + " s. WIN";
-                SetButtonsDisabled();
+                gameplay.SetButtonsDisabled(buttons);
             }
         }
         private void ClearBoard()
@@ -96,30 +91,16 @@ namespace Minesweeper
                 buttons[i].ForeColor = System.Drawing.Color.Black;
                 buttons[i].BackColor = Color.FromArgb(192, 192, 192);
             }
-            mines = new List<int>();
+            mines.initMines();
         }
-        private void SetButtonsDisabled()
-        {
-            for (int i = 0; i < 100; i++)
-            {
-                buttons[i].Enabled = false;
-            }
-        }
-        private void DeleteAllButtons()
-        {
-            flowLayoutPanel1.Visible = false;
-            for (int i = 0; i < 100; i++)
-            {
-                flowLayoutPanel1.Controls.Remove(buttons[i]);
-            }
-        }
-
-
-        private int RandomNumber(int a, int b)
-        {
-            Random rand = new Random();
-            return rand.Next(a, b);
-        }
+        //private void DeleteAllButtons()
+        //{
+         //   flowLayoutPanel1.Visible = false;
+           // for (int i = 0; i < 100; i++)
+            //{
+              //  flowLayoutPanel1.Controls.Remove(buttons[i]);
+            //}
+        //}
      
 
         private void Form1_Load(object sender, EventArgs e)
@@ -136,11 +117,11 @@ namespace Minesweeper
             startTimer();
         }
                 Boolean flag = true;
-        private void button1_Click(object sender, EventArgs e)
+        private void field_LeftClick(object sender, EventArgs e)
         {
             clickButton(sender);
         }
-        private void button1_RightClick(object sender, EventArgs e)
+        private void field_RightClick(object sender, EventArgs e)
         {
             Button button = (Button)sender;
             if(button.Text != " " && button.Text != "!")
@@ -176,11 +157,11 @@ namespace Minesweeper
             button.BackColor = Color.FromArgb(225, 225, 225);
             buttons[Int32.Parse(button.Name)].BackColor = Color.FromArgb(225, 225, 225);
             buttons[Int32.Parse(button.Name)].Text = " ";
-            if (mines.Contains(Int32.Parse(button.Name)))
+            if (mines.getMines().Contains(Int32.Parse(button.Name)))
             {
                 button.ForeColor = System.Drawing.Color.Red;
                 ShowMines();
-                SetButtonsDisabled();
+                gameplay.SetButtonsDisabled(buttons);
                 timer.Stop();
                 label.ForeColor = System.Drawing.Color.OrangeRed;
             }
@@ -190,18 +171,18 @@ namespace Minesweeper
                 {
                     for (int i = 0; i < 20; i++)
                     {
-                        int tempnumber = RandomNumber(0, 99);
-                        while (IsMine(tempnumber) || tempnumber == Int32.Parse(button.Name))
+                        int tempnumber = Generating.RandomNumber(0, 99);
+                        while (rules.IsMine(tempnumber, mines.getMines()) || tempnumber == Int32.Parse(button.Name))
                         {
-                            tempnumber = RandomNumber(0, 99);
+                            tempnumber = Generating.RandomNumber(0, 99);
                         }
-                        mines.Add(tempnumber);
+                        mines.AddMine(tempnumber);
                     }
                     //ShowMines();
                     InitGame = true;
                 }
                 
-                int AdjacentMinesNumber = CountAdjacentMines(button);
+                int AdjacentMinesNumber = gameplay.CountAdjacentMines(button, mines.getMines());
                 String name = button.Name;
                 if ((AdjacentMinesNumber != 0))
                 {
@@ -247,7 +228,7 @@ namespace Minesweeper
                                     if (j == 0 && i == 0) continue;
                                 Console.WriteLine(i);
                                 Console.WriteLine(j);
-                                    if (IsValid(row - i, col - j) && !IsMine(10 * (row - i) + col - j))
+                                    if (rules.IsValid(row - i, col - j) && ! rules.IsMine(10 * (row - i) + col - j, mines.getMines()))
                                     {
                                     int number = 10 * (row - i) + col - j;
                                     if (buttons[number].BackColor == Color.FromArgb(225, 225, 225)) continue;
@@ -282,7 +263,7 @@ namespace Minesweeper
 
             }
             //flag = true;
-            CheckWin();
+            setWin();
         }
         private void ShowMines()
         {
@@ -291,72 +272,10 @@ namespace Minesweeper
                 //buttons[i].Text = "";
                 //buttons[i].UseVisualStyleBackColor = true;
             }
-            foreach (var mine in mines)
+            foreach (var mine in mines.getMines())
             {
                 buttons[mine].Text = "X";
             }
-        }
-        private int CountAdjacentMines(Button button)
-        {
-            //int placeNumber = Int32.Parse(button.Name);
-            //int AdjacentMines = 0;
-            //List<int> PlacesToCheck = new List<int>();
-            //int Number = -12;
-            //for (int i = 0; i < 8; i++)
-            //{
-            //    Number++;
-            //    if (Number == 0)
-            //    {
-            //        Number = 1;
-            //    }
-            //    if ((placeNumber - Number) < 101 && (placeNumber - Number) > 0)
-            //    {
-            //        PlacesToCheck.Add(placeNumber - Number);
-            //    }
-
-            //    if (Number == -9)
-            //    {
-            //        Number = -2;
-            //    }
-            //    if (Number == 1)
-            //    {
-            //        Number = 8;
-            //    }
-            //}
-            //foreach (int place in PlacesToCheck)
-            //{
-            //    if (IsMine(place))
-            //    {
-            //        AdjacentMines++;
-            //    }
-            //}
-            //return AdjacentMines;
-
-            int row = Int32.Parse(button.Name) / 10;
-            int col = Int32.Parse(button.Name) % 10;
-            int AdjacentMines = 0;
-            for(int i = -1; i < 2; i++)
-            {
-                for (int j = -1; j < 2; j++)
-                    if (IsValid(row-i, col - j) && IsMine(10 * (row-i) + col - j))
-                    {
-                        AdjacentMines++;
-                    }
-            }
-            return AdjacentMines;
-        }
-        private Boolean IsMine(int placeNumber)
-        {
-            if (mines.Contains(placeNumber))
-            {
-                return true;
-            }
-            else return false;
-        }
-        private Boolean IsValid(int row, int column)
-        {
-            if (row < 0 || row > 9) return false;
-            return column < 10 && column >-1;
         }
 
         private void flowLayoutPanel1_Paint(object sender, PaintEventArgs e)
@@ -364,25 +283,92 @@ namespace Minesweeper
 
         }
 
-        private void przycisk(object sender, MouseEventArgs e)
-        {
-            switch (MouseButtons)
-            {
-                case MouseButtons.Right:
-                    Console.WriteLine("dziala");
-                    break;
-            }
-        }
-
         private void timer_Tick(object sender, EventArgs e)
         {
             time++;
-            label.Text = "0 s.";
+            label.Text = time.ToString() + " s.";
         }
 
-        private void menuToolStripMenuItem_Click(object sender, EventArgs e)
+    }
+    public partial class Rules : Form{
+        private List<Button> buttons;
+        public bool isWin(List<Button> buttons) {
+            int count = 0;
+            for (int i = 0; i < 100; i++)
+            {
+                if(buttons[i].BackColor != Color.FromArgb(192, 192, 192))
+                {
+                    count++;
+                }
+            }
+            if(count == 80)
+            {
+                return true;
+            }
+            return false;
+        }
+        public Boolean IsMine(int placeNumber, List<int> mines)
         {
-
+            if (mines.Contains(placeNumber))
+            {
+                return true;
+            }
+            else return false;
         }
+        public Boolean IsValid(int row, int column)
+        {
+            if (row < 0 || row > 9) return false;
+            return column < 10 && column >-1;
+        }
+    }
+    public partial class Gameplay : Rules{
+        public int CountAdjacentMines(Button button, List<int> mines) 
+        {
+            int row = Int32.Parse(button.Name) / 10;
+            int col = Int32.Parse(button.Name) % 10;
+            int AdjacentMines = 0;
+            for(int i = -1; i < 2; i++)
+            {
+                for (int j = -1; j < 2; j++)
+                    if (IsValid(row-i, col - j) && IsMine(10 * (row-i) + col - j, mines))
+                    {
+                        AdjacentMines++;
+                    }
+            }
+            return AdjacentMines;
+        }
+        public void SetButtonsDisabled(List<Button> buttons)
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                buttons[i].Enabled = false;
+            }
+        }
+    }
+    public partial class Stopwatch{
+        
+    } 
+    public abstract class Generating{
+        public static int RandomNumber(int a, int b)
+        {
+            Random rand = new Random();
+            return rand.Next(a, b);
+        }
+    } 
+    public class Mines{
+        private List<int> mines;
+        public void initMines(){ 
+            mines =  new List<int>();
+        }
+        public void setMines(List<int> mines){
+            this.mines = mines;
+        }
+        public List<int> getMines(){
+            return mines;
+        }
+        public void AddMine(int tempnumber){
+            this.mines.Add(tempnumber);
+        }
+    
     }
 }

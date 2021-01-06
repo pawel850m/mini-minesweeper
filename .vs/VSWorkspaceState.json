@@ -1,8 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Minesweeper"
+    "\\Minesweeper",
+    "\\Minesweeper\\obj",
+    "\\Minesweeper\\Properties"
   ],
-  "SelectedNode": "\\Minesweeper.sln",
+  "SelectedNode": "\\Minesweeper\\Form1.cs",
   "PreviewInSolutionExplorer": false
 }
