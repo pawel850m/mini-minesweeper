@@ -15,32 +15,33 @@ namespace Minesweeper
 {
 	public partial class Form1 : Form
 	{
-       private int time = 0;
+        //private int time = 0;
         
         private List<Button> buttons;
         private Boolean InitGame;
         private Label label;
-        private Rules rules;
         private Gameplay gameplay;
-        private Mines mines = new Mines();
+        private Mines mines;
+        private Stopwatch stopwatch;
+
         public Form1()
 		{
 			InitializeComponent();
             InitGame = false;
             InitBoard();
-            rules = new Rules();
-           gameplay = new Gameplay();
 		}
-        private void startTimer()
-        {
-            time = 0;
-            timer.Start();
-        }
         private void InitBoard()
         {
-            startTimer();
+            gameplay = new Gameplay();
+            mines = new Mines();
+            stopwatch = new Stopwatch();
+            buttons = new List<Button>();
+            mines.initMines();
+
+            stopwatch.reset();
+            timer.Start();
+
             label = new Label();
-            label.Text = "10:00 WIN";
             label.AutoSize = true;
             label.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             label.Location = new System.Drawing.Point(0, 0);
@@ -49,9 +50,6 @@ namespace Minesweeper
             label.TabIndex = 0;
             flowLayoutPanel2.Controls.Add(label);
 
-
-            buttons = new List<Button>();
-            mines.initMines();
             for (int i = 0; i < 100; i++)
             {
                 Button button1 = new Button();
@@ -62,7 +60,6 @@ namespace Minesweeper
                 button1.Text = " ";
                 button1.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
                 button1.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
-                //button1.Text = (i + 1).ToString();
                 button1.Cursor = System.Windows.Forms.Cursors.Hand;
                 button1.Margin = new System.Windows.Forms.Padding(0);
                 flowLayoutPanel1.Controls.Add(button1);
@@ -71,17 +68,7 @@ namespace Minesweeper
             }
             flowLayoutPanel1.Visible = true;
         }
-
-        private void setWin()
-        {
-            if(rules.isWin(buttons))
-            {
-                timer.Stop();
-                label.ForeColor = System.Drawing.Color.ForestGreen;
-                label.Text = (time - 1).ToString() + " s. WIN";
-                gameplay.SetButtonsDisabled(buttons);
-            }
-        }
+        
         private void ClearBoard()
         {
             for (int i = 0; i < 100; i++)
@@ -92,47 +79,36 @@ namespace Minesweeper
                 buttons[i].BackColor = Color.FromArgb(192, 192, 192);
             }
             mines.initMines();
-        }
-        //private void DeleteAllButtons()
-        //{
-         //   flowLayoutPanel1.Visible = false;
-           // for (int i = 0; i < 100; i++)
-            //{
-              //  flowLayoutPanel1.Controls.Remove(buttons[i]);
-            //}
-        //}
-     
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            menuToolStripMenuItem.Click += new System.EventHandler(restart);
-        }
+        }  
         private void restart(object sender, EventArgs e)
         {
             label.ForeColor = System.Drawing.Color.Black;
             InitGame = false;
-            flag = true;
             ClearBoard();
-            label.Text = "restarting...";
-            startTimer();
+            stopwatch.reset();
+            stopwatch.UpdateLabel(label, " ");
+            timer.Start();
         }
-                Boolean flag = true;
-        private void field_LeftClick(object sender, EventArgs e)
-        {
-            clickButton(sender);
-        }
-        private void field_RightClick(object sender, EventArgs e)
-        {
-            Button button = (Button)sender;
+
+       // private void setWin()
+       // {
+         //   if(rules.isWin(buttons))
+           // {
+             //   timer.Stop();
+               // label.ForeColor = System.Drawing.Color.ForestGreen;
+          //      stopwatch.UpdateLabel(label, (stopwatch.getSeconds() - 1).ToString() + " s. WIN");
+            ///    gameplay.SetButtonsDisabled(buttons);
+            //}
+       // }
+       private bool IsNotEmpty(Button button){
             if(button.Text != " " && button.Text != "!")
             {
-                return;
+                return true;
             }
-            switch (MouseButtons)
-            {
-                case MouseButtons.Right:
-                    
-                    if(button.Text == "!")
+            return false;
+        }
+        private void setFlag(Button button){
+            if(button.Text == "!")
                     {
                         button.ForeColor = System.Drawing.Color.Black;
                         button.Text = " ";
@@ -142,43 +118,52 @@ namespace Minesweeper
                         button.ForeColor = System.Drawing.Color.OrangeRed;
                         button.Text = "!";
                     }
-                    
+        }
+        private void field_LeftClick(object sender, EventArgs e)
+        {
+            clickButton(sender);
+        }
+        private void field_RightClick(object sender, EventArgs e)
+        {
+            Button button = (Button)sender;
+            if(IsNotEmpty(button))
+            {
+                return;
+            }
+            switch (MouseButtons)
+            {
+                case MouseButtons.Right: 
+                    setFlag(button);
                     break;
             }
-            
+        }
+        private bool isFieldFlagged(Button field){
+            if (field.Text == "!")
+            {
+                return true;
+            }
+            return false;
         }
         private void clickButton(object sender)
         {
+
             Button button = (Button)sender;
-            if (button.Text == "!")
+            if (isFieldFlagged(button))
             {
                 return;
             }
             button.BackColor = Color.FromArgb(225, 225, 225);
             buttons[Int32.Parse(button.Name)].BackColor = Color.FromArgb(225, 225, 225);
             buttons[Int32.Parse(button.Name)].Text = " ";
-            if (mines.getMines().Contains(Int32.Parse(button.Name)))
-            {
-                button.ForeColor = System.Drawing.Color.Red;
-                ShowMines();
-                gameplay.SetButtonsDisabled(buttons);
-                timer.Stop();
-                label.ForeColor = System.Drawing.Color.OrangeRed;
+
+            if (mines.getMines().Contains(Int32.Parse(button.Name))){
+                gameplay.setDefeat(mines.getMines(), buttons, label, timer);
             }
             else
             {
                 if (!InitGame)
                 {
-                    for (int i = 0; i < 20; i++)
-                    {
-                        int tempnumber = Generating.RandomNumber(0, 99);
-                        while (rules.IsMine(tempnumber, mines.getMines()) || tempnumber == Int32.Parse(button.Name))
-                        {
-                            tempnumber = Generating.RandomNumber(0, 99);
-                        }
-                        mines.AddMine(tempnumber);
-                    }
-                    //ShowMines();
+                    gameplay.AddMinesToBoard(button,mines, mines.getMines());
                     InitGame = true;
                 }
                 
@@ -189,8 +174,20 @@ namespace Minesweeper
                     button.Text = AdjacentMinesNumber.ToString();
                 }
                 
+                showDigit(AdjacentMinesNumber, button);
+                
+                if ((AdjacentMinesNumber != 0))
+                {
+                    button.Text = AdjacentMinesNumber.ToString();
+                }
 
-                switch (AdjacentMinesNumber)
+            }
+            gameplay.setWin(timer, buttons, label, stopwatch);
+        }
+
+        
+        private void showDigit(int AdjacentMinesNumber, Button button){
+            switch (AdjacentMinesNumber)
                 {
                     case 1:
                         button.ForeColor = System.Drawing.Color.Blue;
@@ -218,17 +215,13 @@ namespace Minesweeper
                         break;
                     default:
                             int row = Int32.Parse(button.Name) / 10;
-                            int col = Int32.Parse(button.Name) % 10;
-
+            int col = Int32.Parse(button.Name) % 10;
                             for (int i = -1; i < 2; i++)
                             {
-                            Console.WriteLine(i);
                             for (int j = -1; j < 2; j++)
                                 {
                                     if (j == 0 && i == 0) continue;
-                                Console.WriteLine(i);
-                                Console.WriteLine(j);
-                                    if (rules.IsValid(row - i, col - j) && ! rules.IsMine(10 * (row - i) + col - j, mines.getMines()))
+                                    if (gameplay.isCorrect(mines.getMines(), button, i, j))
                                     {
                                     int number = 10 * (row - i) + col - j;
                                     if (buttons[number].BackColor == Color.FromArgb(225, 225, 225)) continue;
@@ -238,55 +231,25 @@ namespace Minesweeper
                               
                                 }
                             }
-                            flag = false;
-
-                        
-             
-                        
-                        //button.Text = " ";
-                        //button.ForeColor = System.Drawing.Color.Black;
-                        //int tempnumber = RandomNumber(0, 7);
-                        //int buttonNumber = Int32.Parse(button.Name);
-                        //int[] ButtonNumbersTable = {buttonNumber-11, buttonNumber - 10, buttonNumber - 9, buttonNumber -1,
-                        //buttonNumber + 1, buttonNumber+9, buttonNumber+10, buttonNumber+11};
-                        //while (ButtonNumbersTable[tempnumber] < 0 || ButtonNumbersTable[tempnumber] > 99 || IsMine(tempnumber))
-                        //{
-                        //    tempnumber = RandomNumber(0, 7);
-                        //}
-                        //clickButton(buttons[ButtonNumbersTable[tempnumber]]);
                         break;
                 }
-                if ((AdjacentMinesNumber != 0))
-                {
-                    button.Text = AdjacentMinesNumber.ToString();
-                }
-
-            }
-            //flag = true;
-            setWin();
-        }
-        private void ShowMines()
-        {
-            for (int i = 0; i < 100; i++)
-            {
-                //buttons[i].Text = "";
-                //buttons[i].UseVisualStyleBackColor = true;
-            }
-            foreach (var mine in mines.getMines())
-            {
-                buttons[mine].Text = "X";
-            }
         }
 
         private void flowLayoutPanel1_Paint(object sender, PaintEventArgs e)
         {
 
         }
-
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            menuToolStripMenuItem.Click += new System.EventHandler(restart);
+        }
         private void timer_Tick(object sender, EventArgs e)
         {
-            time++;
-            label.Text = time.ToString() + " s.";
+            if(InitGame){
+                stopwatch.addSecond();
+                stopwatch.UpdateLabel(label);
+            }
+            
         }
 
     }
@@ -322,6 +285,14 @@ namespace Minesweeper
         }
     }
     public partial class Gameplay : Rules{
+        public bool isCorrect(List<int> mines, Button button, int i, int j){
+            int row = Int32.Parse(button.Name) / 10;
+            int col = Int32.Parse(button.Name) % 10;
+            if (IsValid(row - i, col - j) && ! IsMine(10 * (row - i) + col - j, mines)){
+                return true;
+            }
+            return false;
+        }
         public int CountAdjacentMines(Button button, List<int> mines) 
         {
             int row = Int32.Parse(button.Name) / 10;
@@ -337,6 +308,18 @@ namespace Minesweeper
             }
             return AdjacentMines;
         }
+        public void AddMinesToBoard(Button button, Mines mines, List<int> minesList){
+            for (int i = 0; i < 20; i++)
+                    {
+                        int tempnumber = Generating.RandomNumber(0, 99);
+                        while (IsMine(tempnumber, minesList) || tempnumber == Int32.Parse(button.Name))
+                        {
+                            tempnumber = Generating.RandomNumber(0, 99);
+                        }
+                        mines.AddMine(tempnumber);
+                    }
+                    //ShowMines();     
+        }
         public void SetButtonsDisabled(List<Button> buttons)
         {
             for (int i = 0; i < 100; i++)
@@ -344,9 +327,47 @@ namespace Minesweeper
                 buttons[i].Enabled = false;
             }
         }
+        public void ShowMines(List<int> mines, List<Button> fields)
+        {
+            foreach (var mine in mines)
+            {
+                fields[mine].Text = "X";
+            }
+        }
+        public void setDefeat(List<int> mines, List<Button> fields, Label label, System.Windows.Forms.Timer timer) {
+            ShowMines(mines, fields);
+            SetButtonsDisabled(fields);
+            timer.Stop();
+            label.ForeColor = System.Drawing.Color.OrangeRed;
+        }
+        public void setWin(System.Windows.Forms.Timer timer, List<Button> buttons, Label label, Stopwatch stopwatch)
+        {
+            if(isWin(buttons))
+            {
+                timer.Stop();
+                label.ForeColor = System.Drawing.Color.ForestGreen;
+                stopwatch.UpdateLabel(label, (stopwatch.getSeconds() - 1).ToString() + " s. WIN");
+                SetButtonsDisabled(buttons);
+            }
+        }
     }
-    public partial class Stopwatch{
-        
+    public partial class Stopwatch : Form{
+        private int time = 0;
+        public void reset(){
+            time = 0;
+        }
+        public int getSeconds(){
+            return time;
+        }
+        public void addSecond(){
+        time++;
+        }
+        public void UpdateLabel(Label label){
+            label.Text = getSeconds().ToString() + " s.";
+        }
+        public void UpdateLabel(Label label, String text){
+            label.Text = text;
+        }
     } 
     public abstract class Generating{
         public static int RandomNumber(int a, int b)
@@ -369,6 +390,7 @@ namespace Minesweeper
         public void AddMine(int tempnumber){
             this.mines.Add(tempnumber);
         }
+
     
     }
 }
